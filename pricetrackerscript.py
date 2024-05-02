@@ -8,8 +8,8 @@ import numpy as np
 
 # TODO #
 # plotting works if data is incomplete, i.e if a user tracks 4 events ,then decides to track 2 events, the graph works
-# implement adding data and tables to database directly, instead of reading a csv, because that happens locally.
 # clear data automatically that is less than 24 hours apart
+# implement adding data and tables to database directly, instead of reading a csv, because that happens locally
 # implement an update function, updates existing user's events
 # implement remove events
 # figure out how to hold a unique table for each user in sql database
@@ -30,9 +30,9 @@ import numpy as np
 # 6453740 21 Pilots Concert
 
 # SeatGeek API details, where client_id is the username and client_secret is the password
-client_id = 'client_id'
-client_secret = 'secret'
-data_dir = "C:\\Users\\example_user\\OneDrive\\Desktop\\folder\\"
+client_id = 'NDExNTIwNzN8MTcxMzkzMDcyMS43MTgwMzM'
+client_secret = '08e38998e8b5d0e37a5bd65d06615965ab87170481d6b1bba957e0f06614fe94'
+data_dir = "C:\\Users\\ivani\\OneDrive\\Desktop\\pricetracker\\"
 
 # params variable to use for permissions
 params = (('client_id', 'client_secret'),)
@@ -66,6 +66,7 @@ def get_event_list_jsons():
             response_list.append(requests.get(
                 f'https://api.seatgeek.com/2/events/{id}?client_id={client_id}&client_secret={client_secret}').json())
         return response_list
+
     # this try and except statement runs the get event ids function and prompts the user to type the events
     try:
         event_ids = get_event_ids()
@@ -111,7 +112,12 @@ print(stats_dict_list)
 
 
 # converts list of dictionaries with the relevant json stats extracted, into one csv file
-def convert_dicts_to_csv(dict_list, filename='stats.csv'):
+def convert_dicts_to_csv(dict_list):
+    def get_name():
+        name = input("Enter name for creation of csv: ")
+        return name
+
+    username = get_name()
     """
     Writes a list of dictionaries to a CSV file, where each dictionary represents a row in the CSV file.
     """
@@ -122,7 +128,7 @@ def convert_dicts_to_csv(dict_list, filename='stats.csv'):
     # Extract fieldnames from the first dictionary in the list
     fieldnames = dict_list[0].keys()
 
-    with open(filename, 'w', newline='') as outfile:
+    with open(f'{username}.csv', 'w', newline='') as outfile:
         writer = csv.DictWriter(outfile, fieldnames=fieldnames)
 
         # Write header
@@ -137,8 +143,8 @@ def convert_dicts_to_csv(dict_list, filename='stats.csv'):
 convert_dicts_to_csv(stats_dict_list)
 
 # creates variable data which is a data frame of the stats csv (easier to generate graphs and whatnot with dataframe)
-stats_dataframe = pd.read_csv("stats.csv")
-print(stats_dataframe)
+# stats_dataframe = pd.read_csv("stats.csv")
+# print(stats_dataframe)
 
 # ----------------DATABASE SECTION ---------------- #
 
@@ -161,7 +167,6 @@ mycursor = db.cursor()
 
 # #creates a table stats with columns named after the stats dictionary
 def create_user_table():
-
     # defines a function get_name, gets the name of the discord user and creates a sql table with their data.
     def get_name():
         name = input("Enter name: ")
@@ -188,20 +193,24 @@ def create_user_table():
                      ");")
 
 
-# make this into a discord command !createuser
+# make this into a discord command !register
 # create_user_table()
 
 # this reads the csv, and imports the data of the csv into the stats table on the database
-# try to make this modular to support multiple users
+# try to make it so that it just reads the dictionaries into the sql database
 def add_csv_to_db():
-    with open('stats.csv', 'r') as file:
+    def get_name():
+        name = input("Enter name for adding csv to db: ")
+        return name
+
+    username = get_name()
+    with open(f'{username}.csv', 'r') as file:
         reader = csv.reader(file)
         columns = next(reader)
-        query = 'INSERT INTO stats({0}) VALUES({1})'
-        # converts query to VALUES(%s, %s, %s, %s, ... ,%s) SQL syntax
-        query = query.format(','.join(columns), ','.join(['%s'] * len(columns)))
+        # converts query to table=username, VALUES(%s, %s, %s, %s, ... ,%s) SQL syntax
+        query = f'INSERT INTO {username}({",".join(columns)}) VALUES({",".join(["%s"] * len(columns))})'
         for data in reader:
-            print(f"Successfully Inserted ID {data[0]}, '{data[1]}' into stats table")
+            print(f"Successfully Inserted ID {data[0]}, '{data[1]}' into {username} table")
             mycursor.execute(query, data)
             # must use this command to commit the executions to the database
             db.commit()
@@ -271,8 +280,10 @@ def clear_table(table_name):
 # gets the data from the database given a user's id
 def get_data():
     def get_name():
-        name = input("Enter name: ")
+        name = input("Enter name for data retrieval and plotting: ")
         return name
+
+    username = get_name()
     try:
         # Connect to MySQL
         db = mysql.connector.connect(
@@ -285,7 +296,7 @@ def get_data():
 
         # Construct SQL query to select old data and new data
         query = f"""
-            SELECT id, title, lowest_price, current_tme FROM {get_name()} ORDER BY id, current_tme ASC
+            SELECT id, title, lowest_price, current_tme FROM {username} ORDER BY id, current_tme ASC
         """
         # Execute SQL query
         mycursor.execute(query)
@@ -312,41 +323,45 @@ print(prices)
 print(current_time)
 
 
-def convert_timestamp(timestamp):
-    return timestamp.replace('T', ' ')
-
-
-converted_timestamps = [convert_timestamp(timestamp) for timestamp in current_time]
-
 # creates a dictionary with of the relevant details
 # the keys are the unique concert/event ids
 # the values are the artist name, timestamps, and prices of tickets
-artist_data = {}
-for i, _id in enumerate(ids):
-    if _id not in artist_data:
-        artist_data[_id] = {'artist': artists[i], 'timestamps': [], 'prices': []}
-    artist_data[_id]['timestamps'].append(converted_timestamps[i])
-    artist_data[_id]['prices'].append(prices[i])
+# plots the data with the ids, artists, prices, current_time
+def plot_stats(list_of_ids, list_of_artists, list_of_prices, list_of_current_time):
+    def convert_timestamp(timestamp):
+        return timestamp.replace('T', ' ')
 
-# configures plot size on display, figure out how to turn this into an image and display on dc
-plt.figure(figsize=(10, 6))
-# configures the legend to display the artist name as well as their unique id
-# perhaps to make it user-friendly, I can replace id with location of event, as that may be unique as well.
-for _id, data in artist_data.items():
-    label = f'{data["artist"]} (ID: {_id})'  # Include ID in the legend label
-    plt.plot(data['timestamps'], data['prices'], marker='o', label=label)
+    converted_timestamps = [convert_timestamp(timestamp) for timestamp in list_of_current_time]
 
-plt.xlabel('Date and Time')
-plt.ylabel('Price')
-plt.title('Lowest Prices over Time by Artist')
-plt.xticks(rotation=45)
+    artist_data = {}
+    for i, _id in enumerate(list_of_ids):
+        if _id not in artist_data:
+            artist_data[_id] = {'artist': list_of_artists[i], 'timestamps': [], 'prices': []}
+        artist_data[_id]['timestamps'].append(converted_timestamps[i])
+        artist_data[_id]['prices'].append(list_of_prices[i])
 
-# Customizing legend
-handles, labels = plt.gca().get_legend_handles_labels()
-unique_labels = list(set(labels))
-unique_handles = [handles[labels.index(label)] for label in unique_labels]
-plt.legend(unique_handles, unique_labels, loc='upper left')
+    # configures plot size on display, figure out how to turn this into an image and display on dc
+    plt.figure(figsize=(10, 6))
+    # configures the legend to display the artist name as well as their unique id
+    # perhaps to make it user-friendly, I can replace id with location of event, as that may be unique as well.
+    for _id, data in artist_data.items():
+        label = f'{data["artist"]} (ID: {_id})'  # Include ID in the legend label
+        plt.plot(data['timestamps'], data['prices'], marker='o', label=label)
 
-plt.grid(True)
-plt.tight_layout()
-plt.show()
+    plt.xlabel('Date and Time')
+    plt.ylabel('Price')
+    plt.title('Lowest Prices over Time by Artist')
+    plt.xticks(rotation=45)
+
+    # Customizing legend
+    handles, labels = plt.gca().get_legend_handles_labels()
+    unique_labels = list(set(labels))
+    unique_handles = [handles[labels.index(label)] for label in unique_labels]
+    plt.legend(unique_handles, unique_labels, loc='upper left')
+
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+
+plot_stats(ids, artists, prices, current_time)
