@@ -29,9 +29,9 @@ import numpy as np
 # 6453740 21 Pilots Concert
 
 # SeatGeek API details, where client_id is the username and client_secret is the password
-client_id = 'NDExNTIwNzN8MTcxMzkzMDcyMS43MTgwMzM'
-client_secret = '08e38998e8b5d0e37a5bd65d06615965ab87170481d6b1bba957e0f06614fe94'
-data_dir = "C:\\Users\\ivani\\OneDrive\\Desktop\\pricetracker\\"
+client_id = 'client_id'
+client_secret = 'secret'
+data_dir = "C:\\Users\\example_user\\OneDrive\\Desktop\\folder\\"
 
 # params variable to use for permissions
 params = (('client_id', 'client_secret'),)
