@@ -8,6 +8,7 @@ import numpy as np
 
 # TODO #
 # plotting works if data is incomplete, i.e if a user tracks 4 events ,then decides to track 2 events, the graph works
+# implement adding data and tables to database directly, instead of reading a csv, because that happens locally.
 # clear data automatically that is less than 24 hours apart
 # implement an update function, updates existing user's events
 # implement remove events
