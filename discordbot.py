@@ -30,11 +30,11 @@ async def on_ready() -> None:
 async def hello(ctx):
     var = randint(1, 6)
     if var < 4:
-        response = f'{var}, wow your luck is ass'
+        response = f'{var}, Below 4, Unlucky.'
     elif var == 4 or var == 5:
-        response = f'{var}, ur luck is kinda good'
+        response = f'{var}, 4 or 5, Sorta Lucky'
     else:
-        response = f'{var}, ur luck is so good'
+        response = f'{var}, 6! So Lucky!'
     await ctx.send(response)
 
 
@@ -42,13 +42,13 @@ async def hello(ctx):
 async def speak(ctx, user_input):
     lowered: str = user_input.lower()
     if lowered == '':
-        response = 'Speak up bitch!'
+        response = 'Speak up please!'
     elif 'hello' in lowered:
         response = 'Hello'
     elif 'how are you' in lowered:
-        response = 'Fuck off'
+        response = 'Doing Fine, how are you?'
     elif 'bye' in lowered:
-        response = 'Later bitch'
+        response = 'Talk to you later!'
     else:
         response = 'Say something like hello/how are you/bye'
     await ctx.send(response)
