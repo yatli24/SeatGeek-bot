@@ -8,11 +8,6 @@ import numpy as np
 
 ### NOTES ###
 # The SeatGeek API is running on EDT
-# Test event IDs:
-# 6480339 Shakira concert
-# 6471282 Bruno Mars Concert
-# 6441103 Hans Zimmer Concert
-# 6453740 21 Pilots Concert
 
 # SeatGeek API details, where client_id is the username and client_secret is the password
 client_id = 'id'
@@ -21,8 +16,6 @@ data_dir = "C:\\Users\\example_user\\OneDrive\\Desktop\\folder\\"
 
 
 params = (('client_id', 'client_secret'),)
-
-sample_ids = [6480339, 6471282, 6441103, 6453740]
 
 
 # a function that calls the get_event_ids and get_event_jsons functions at the same time
