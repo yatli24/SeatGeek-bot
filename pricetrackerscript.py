@@ -6,24 +6,9 @@ import mysql.connector
 from matplotlib import pyplot as plt
 import numpy as np
 
-# TODO #
-# plotting works if data is incomplete, i.e if a user tracks 4 events ,then decides to track 2 events, the graph works
-# clear data automatically that is less than 24 hours apart
-# implement adding data and tables to database directly, instead of reading a csv, because that happens locally
-# implement an update function, updates existing user's events
-# implement remove events
-# figure out how to hold a unique table for each user in sql database
-# figure out how to hold multiple user data on a discord bot
-# if possible, move all of this to the cloud and automate updating (SQL server, discord bot)
-# perhaps other data in the scrape could be useful, such as number of listings, date of event
-# maybe make something useful to the user? (reminders of when events are, alerts that price went down)
-
-
 ### NOTES ###
-# remember to use two \ in the directory definitions for it to work
-# The SeatGeek API is running on Michigan time
-# plotting works when there are multiple of the same timestamp
-# test event IDs:
+# The SeatGeek API is running on EDT
+# Test event IDs:
 # 6480339 Shakira concert
 # 6471282 Bruno Mars Concert
 # 6441103 Hans Zimmer Concert
@@ -34,7 +19,7 @@ client_id = 'id'
 client_secret = 'secret'
 data_dir = "C:\\Users\\example_user\\OneDrive\\Desktop\\folder\\"
 
-# params variable to use for permissions
+
 params = (('client_id', 'client_secret'),)
 
 sample_ids = [6480339, 6471282, 6441103, 6453740]
@@ -44,7 +29,6 @@ sample_ids = [6480339, 6471282, 6441103, 6453740]
 # returns list of raw event jsons for multiple events (up to 4)
 def get_event_list_jsons():
     # prompts the user to input event IDs, up to 4, then returns a list of event IDs
-    # change this to a command on discord, !track id id id id
     def get_event_ids():
         event_ids = []
         while len(event_ids) < 4:
@@ -59,7 +43,6 @@ def get_event_list_jsons():
                 raise ValueError("Event ID must be an integer")
         return event_ids
 
-    # a function that grabs event ID list, and puts the raw json data into a list
     def get_event_jsons(event_id_list):
         response_list = []
         for id in event_id_list:
@@ -67,7 +50,6 @@ def get_event_list_jsons():
                 f'https://api.seatgeek.com/2/events/{id}?client_id={client_id}&client_secret={client_secret}').json())
         return response_list
 
-    # this try and except statement runs the get event ids function and prompts the user to type the events
     try:
         event_ids = get_event_ids()
         print("Event IDs:", event_ids)  # Print event IDs just for confirmation
@@ -77,18 +59,14 @@ def get_event_list_jsons():
         return []
 
 
-# stores the list of raw jsons (multiple dictionaries) into a variable by calling the get_event_list_jsons function
+
 jsons = get_event_list_jsons()
 
 
 # takes json data (one dictionary), and returns a dictionary with the relevant stats
+# Keys: columns
+# Values: data
 def get_stats(json_data):
-    """
-    takes json_data and extracts the relevant statistics from the data; returns a dictionary containing these stats
-    the response argument is the raw json text that was scraped from the api. This is the dictionary.
-    define a new dictionary, stats, whose keys are relevant keys from the response json, and values are the index of
-    those relevant keys in the response json
-    """
     stats = {'id': json_data['id'], 'title': json_data['title'], 'listing_count': json_data['stats']['listing_count'],
              'lowest_price': json_data['stats']['lowest_price'], 'median_price': json_data['stats']['median_price'],
              'average_price': json_data['stats']['average_price'], 'highest_price': json_data['stats']['highest_price'],
@@ -142,25 +120,16 @@ def convert_dicts_to_csv(dict_list):
 # call the function and create the csv
 convert_dicts_to_csv(stats_dict_list)
 
-# creates variable data which is a data frame of the stats csv (easier to generate graphs and whatnot with dataframe)
-# stats_dataframe = pd.read_csv("stats.csv")
-# print(stats_dataframe)
-
 # ----------------DATABASE SECTION ---------------- #
 
 db = mysql.connector.connect(
     host="localhost",
     user="root",
-    passwd="portal2gunIV!",
-    database='price_tracker_stats'
+    passwd="password",
+    database='database'
 )
 
 mycursor = db.cursor()
-
-
-# # deletes oldest 4 entries from the stats table
-# mycursor.execute("DELETE FROM stats ORDER BY current_tme ASC LIMIT 4;")
-# db.commit()
 
 # # drops table stats
 # mycursor.execute("DROP TABLE stats")
@@ -175,8 +144,8 @@ def create_user_table():
     db = mysql.connector.connect(
         host="localhost",
         user="root",
-        passwd="portal2gunIV!",
-        database='price_tracker_stats'
+        passwd="password",
+        database='database'
     )
 
     mycursor = db.cursor()
@@ -193,11 +162,11 @@ def create_user_table():
                      ");")
 
 
-# make this into a discord command !register
+
 # create_user_table()
 
 # this reads the csv, and imports the data of the csv into the stats table on the database
-# try to make it so that it just reads the dictionaries into the sql database
+
 def add_csv_to_db():
     def get_name():
         name = input("Enter name for adding csv to db: ")
@@ -218,8 +187,6 @@ def add_csv_to_db():
 
 add_csv_to_db()
 
-
-# reads a sql table from my database and makes it into a pandas dataframe
 def create_df(table_name):
     db = mysql.connector.connect(
         host="localhost",
@@ -269,15 +236,8 @@ def clear_table(table_name):
 # clear_table('old_time_stats')
 
 
-# ----------------TEST PLOTTING---------------- #
-# old_time_stats has all the data. Sort by time extract and plot the similar ids
-# test event IDs:
-# 6480339 Shakira concert
-# 6471282 Bruno Mars Concert
-# 6441103 Hans Zimmer Concert
-# 6453740 21 Pilots Concert
+# ----------------PLOTTING---------------- #
 
-# gets the data from the database given a user's id
 def get_data():
     def get_name():
         name = input("Enter name for data retrieval and plotting: ")
@@ -323,10 +283,9 @@ print(prices)
 print(current_time)
 
 
-# creates a dictionary with of the relevant details
-# the keys are the unique concert/event ids
-# the values are the artist name, timestamps, and prices of tickets
-# plots the data with the ids, artists, prices, current_time
+# creates a dictionary with the relevant details
+# Keys: concert/event ids
+# Values: artist name, timestamps, and prices of tickets
 def plot_stats(list_of_ids, list_of_artists, list_of_prices, list_of_current_time):
     def convert_timestamp(timestamp):
         return timestamp.replace('T', ' ')
@@ -340,10 +299,8 @@ def plot_stats(list_of_ids, list_of_artists, list_of_prices, list_of_current_tim
         artist_data[_id]['timestamps'].append(converted_timestamps[i])
         artist_data[_id]['prices'].append(list_of_prices[i])
 
-    # configures plot size on display, figure out how to turn this into an image and display on dc
     plt.figure(figsize=(10, 6))
-    # configures the legend to display the artist name as well as their unique id
-    # perhaps to make it user-friendly, I can replace id with location of event, as that may be unique as well.
+
     for _id, data in artist_data.items():
         label = f'{data["artist"]} (ID: {_id})'  # Include ID in the legend label
         plt.plot(data['timestamps'], data['prices'], marker='o', label=label)
@@ -353,7 +310,7 @@ def plot_stats(list_of_ids, list_of_artists, list_of_prices, list_of_current_tim
     plt.title('Lowest Prices over Time by Artist')
     plt.xticks(rotation=45)
 
-    # Customizing legend
+    # Configures Legend
     handles, labels = plt.gca().get_legend_handles_labels()
     unique_labels = list(set(labels))
     unique_handles = [handles[labels.index(label)] for label in unique_labels]
