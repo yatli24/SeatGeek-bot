@@ -1,10 +1,13 @@
 import datetime
+import sklearn
 import requests
 import csv
 import pandas as pd
 import mysql.connector
 from matplotlib import pyplot as plt
 import numpy as np
+from sklearn.model_selection import train_test_split
+
 
 ### NOTES ###
 # The SeatGeek API is running on EDT
