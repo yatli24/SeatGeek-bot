@@ -4,6 +4,7 @@ import time
 import discord
 from discord.ext import commands
 from discord import Message, Client, Intents
+import pricetrackerscript
 
 ### NOTES ###
 # ctx is a default object that refers to the current command being used, and where it is being used
