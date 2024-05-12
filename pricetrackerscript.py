@@ -21,10 +21,7 @@ data_dir = "C:\\Users\\example_user\\OneDrive\\Desktop\\folder\\"
 params = (('client_id', 'client_secret'),)
 
 
-# a function that calls the get_event_ids and get_event_jsons functions at the same time
-# returns list of raw event jsons for multiple events (up to 4)
 def get_event_list_jsons():
-    # prompts the user to input event IDs, up to 4, then returns a list of event IDs
     def get_event_ids():
         event_ids = []
         while len(event_ids) < 4:
@@ -54,12 +51,8 @@ def get_event_list_jsons():
         print("Error:", ve)
         return []
 
-
-
 jsons = get_event_list_jsons()
 
-
-# takes json data (one dictionary), and returns a dictionary with the relevant stats
 # Keys: columns
 # Values: data
 def get_stats(json_data):
@@ -71,7 +64,6 @@ def get_stats(json_data):
     return stats
 
 
-# returns a list of dictionaries with the relevant stats extracted from the multiple raw jsons by the get_stats function
 def get_stats_dict_list(jsons_list):
     dict_list = []
     for i in range(len(jsons_list)):
@@ -79,13 +71,10 @@ def get_stats_dict_list(jsons_list):
     return dict_list
 
 
-# creates a variable which is a list of dictionaries of inputted event ids (up to 4) with their relevant stats
-
 stats_dict_list = get_stats_dict_list(jsons)
 print(stats_dict_list)
 
 
-# converts list of dictionaries with the relevant json stats extracted, into one csv file
 def convert_dicts_to_csv(dict_list):
     def get_name():
         name = input("Enter name for creation of csv: ")
@@ -112,8 +101,6 @@ def convert_dicts_to_csv(dict_list):
         for dictionary in dict_list:
             writer.writerow(dictionary)
 
-
-# call the function and create the csv
 convert_dicts_to_csv(stats_dict_list)
 
 # ----------------DATABASE SECTION ---------------- #
@@ -127,12 +114,9 @@ db = mysql.connector.connect(
 
 mycursor = db.cursor()
 
-# # drops table stats
-# mycursor.execute("DROP TABLE stats")
-
-# #creates a table stats with columns named after the stats dictionary
+# Creates a table stats with columns named after the stats dictionary
 def create_user_table():
-    # defines a function get_name, gets the name of the discord user and creates a sql table with their data.
+    # Defines a function get_name, gets the name of the discord user and creates a sql table with their data.
     def get_name():
         name = input("Enter name for creation of table: ")
         return name
@@ -208,12 +192,6 @@ def create_df(table_name):
     return df
 
 
-old_time_stats_df = create_df('old_time_stats')
-
-
-# print(old_time_stats_df)
-
-
 def clear_table(table_name):
     db = mysql.connector.connect(
         host="localhost",
@@ -228,10 +206,6 @@ def clear_table(table_name):
     print("Successfully deleted all entries in {}".format(table_name))
 
 
-# clear_table('stats')
-# clear_table('old_time_stats')
-
-
 # ----------------PLOTTING---------------- #
 
 def get_data():
@@ -241,7 +215,7 @@ def get_data():
 
     username = get_name()
     try:
-        # Connect to MySQL
+
         db = mysql.connector.connect(
             host="localhost",
             user="root",
@@ -250,11 +224,11 @@ def get_data():
         )
         mycursor = db.cursor()
 
-        # Construct SQL query to select old data and new data
+        
         query = f"""
             SELECT id, title, lowest_price, current_tme FROM {username} ORDER BY id, current_tme ASC
         """
-        # Execute SQL query
+        
         mycursor.execute(query)
 
         # Fetch all rows
@@ -272,12 +246,6 @@ def get_data():
 
 
 ids, artists, prices, current_time = get_data()
-
-print(ids)
-print(artists)
-print(prices)
-print(current_time)
-
 
 # creates a dictionary with the relevant details
 # Keys: concert/event ids
