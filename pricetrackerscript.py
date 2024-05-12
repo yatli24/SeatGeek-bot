@@ -145,8 +145,7 @@ def create_user_table():
 
 # create_user_table()
 
-# this reads the csv, and imports the data of the csv into the stats table on the database
-
+# Export data to database
 def add_csv_to_db():
     def get_name():
         name = input("Enter name for adding csv to db: ")
@@ -191,7 +190,7 @@ def create_df(table_name):
     df = pd.DataFrame(table, columns=column_names)
     return df
 
-
+# Admin Usage Only
 def clear_table(table_name):
     db = mysql.connector.connect(
         host="localhost",
@@ -290,18 +289,25 @@ plot_stats(ids, artists, prices, current_time)
 # ----------------PREDICTIVE MODELING---------------- #
 
 concert_data = pd.read_csv('stats.csv')
-print(concert_data)
+
+# Convert timestamp columns to numeric values
+timestamp_cols = ['announced', 'event_timestamp', 'current_tme']
+for col in timestamp_cols:
+    concert_data[col] = pd.to_datetime(concert_data[col]).astype('int64') // 10**9
+
+# Drop non-numeric or non-relevant columns
+concert_data = concert_data.drop(columns=['id', 'title'])
 
 # Preprocess the data
-X = concert_data.drop(columns=['title', 'event_timestamp', 'lowest_price', 'median_price', 'average_price', 'highest_price'])
+X = concert_data.drop(columns=['average_price'])  # Features
 y = concert_data['average_price']  # Target variable
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Choose a linear regression model
+# Choose a Linear Regression Model
 model = LinearRegression()
 model.fit(X_train, y_train)
 
-# Generate a prediction with the model
+# Generate the Predictive Model
 y_pred = model.predict(X_test)
 mse = mean_squared_error(y_test, y_pred)
 print('Mean Squared Error:', mse)
