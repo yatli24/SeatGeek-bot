@@ -318,3 +318,30 @@ def plot_stats(list_of_ids, list_of_artists, list_of_prices, list_of_current_tim
 
 
 plot_stats(ids, artists, prices, current_time)
+
+# ----------------PREDICTIVE MODELING---------------- #
+
+concert_data = pd.read_csv('stats.csv')
+print(concert_data)
+
+# Preprocess the data
+X = concert_data.drop(columns=['title', 'event_timestamp', 'lowest_price', 'median_price', 'average_price', 'highest_price'])
+y = concert_data['average_price']  # Target variable
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Choose a linear regression model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Generate a prediction with the model
+y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+print('Mean Squared Error:', mse)
+
+# Plot
+
+plt.scatter(y_test, y_pred)
+plt.xlabel('Actual Prices')
+plt.ylabel('Predicted Prices')
+plt.title('Actual vs. Predicted Prices')
+plt.show()
