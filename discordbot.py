@@ -94,7 +94,6 @@ async def prune(ctx, user_int):
         time.sleep(3)
         await msg.delete()
 
-
 @client.command(name='helpme')
 async def helpme(ctx):
     await ctx.send("List of commands:\n\n"
