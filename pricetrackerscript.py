@@ -246,7 +246,7 @@ def get_data():
 
 ids, artists, prices, current_time = get_data()
 
-# creates a dictionary with the relevant details
+# Create Dictionary with relevant stats
 # Keys: concert/event ids
 # Values: artist name, timestamps, and prices of tickets
 def plot_stats(list_of_ids, list_of_artists, list_of_prices, list_of_current_time):
