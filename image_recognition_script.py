@@ -52,14 +52,14 @@ def get_predominant_color(image_path):
 def generate_color_comment(color):
     hex_color = colors.to_hex([c/255.0 for c in color])
     color_comments = {
-        "#ff0000": "The image is dominated by a vibrant red hue.",
-        "#00ff00": "The image is full of refreshing green.",
-        "#0000ff": "The image has a calming blue tone.",
-        "#ffffff": "The image is mostly white and bright.",
-        "#000000": "The image is quite dark with predominant black.",
-        "#ffff00": "The image is glowing with yellow.",
-        "#ff00ff": "The image is filled with a playful magenta.",
-        "#00ffff": "The image has a cool cyan color."
+        "#ff0000": "A vibrant, glorious red hue.",
+        "#00ff00": "A crisp refreshing green.",
+        "#0000ff": "Ahh... blue like the ocean.",
+        "#ffffff": "A flash of mostly bright white.",
+        "#000000": "A dark and mysterious sight.",
+        "#ffff00": "Make sure to bring sunglasses to view the sunny yellow glow!",
+        "#ff00ff": "A playful, curious magenta.",
+        "#00ffff": "The cool cyan color reminds me of the sky."
     }
     return color_comments.get(hex_color, f"The predominant color in the image is {hex_color}.")
 
@@ -68,7 +68,7 @@ def generate_object_comment(class_ids, classes):
     object_comments = {
         "person": "I see a person. Who is that?",
         "car": "Cool car!",
-        "bicycle": "The image shows a bicycle.",
+        "bicycle": "How many miles are on that bike?",
         "dog": "That is a lovely dog!",
         "cat": "What a nice cat!",
         "horse": "Neigh! Ginny!",
@@ -81,7 +81,7 @@ def generate_object_comment(class_ids, classes):
     if comments:
         return " ".join(comments)
     else:
-        return "The image does not contain any recognizable characters or figures."
+        return "The image does not contain any recognizable objects or figures."
 
 def main(image_path):
     image = cv2.imread(image_path)
