@@ -4,29 +4,23 @@ import time
 import discord
 from discord.ext import commands
 from discord import Message, Client, Intents
-import pricetrackerscript
-
-### NOTES ###
-# ctx is a default object that refers to the current command being used, and where it is being used
-# the ctx object has attributes such as send, message, author, mention, etc. (research more)
+import price_tracker_script
+import image_recognition_script
 
 
-# sets up the bot, commands prefix, enables all permissions
-# refers to the bot as client in the code
 client = commands.Bot(command_prefix="!", intents=discord.Intents.all())
 
 # Bot's token
 token = 'token'
 
 
-# initiate bot
+# Initiate bot
 @client.event
 async def on_ready() -> None:
     print(f'{client.user} is now running.')
     print("____________________________")
 
 
-# define a command for the bot
 @client.command(name="roll")
 async def hello(ctx):
     var = randint(1, 6)
