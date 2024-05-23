@@ -49,6 +49,8 @@ def get_predominant_color(image_path):
     predominant_color = pixel_counts.most_common(1)[0][0]
     return predominant_color
 
+
+# Generate a color based comment
 def generate_color_comment(color):
     hex_color = colors.to_hex([c/255.0 for c in color])
     color_comments = {
@@ -63,7 +65,7 @@ def generate_color_comment(color):
     }
     return color_comments.get(hex_color, f"The predominant color in the image is {hex_color}.")
 
-
+# Generate an object based comment
 def generate_object_comment(class_ids, classes):
     object_comments = {
         "person": "I see a person. Who is that?",
