@@ -63,6 +63,7 @@ async def track(ctx, user_input):
 @client.command(name='reccommend')
 async def track(ctx, user_input):
     price_tracker_script.plot_stats()
+    price_tracker_script.predict()
     await ctx.send(f'Loading...')
 
 @client.command(name='discuss')
