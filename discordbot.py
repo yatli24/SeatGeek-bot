@@ -57,12 +57,12 @@ async def use(ctx, user_input):
 @client.command(name='track')
 async def track(ctx, user_input):
     price_tracker_script.track()
-    price_tracker_script.graph()
+    price_tracker_script.plot_stats()
     await ctx.send(f'Loading...')
 
 @client.command(name='reccommend')
 async def track(ctx, user_input):
-    price_tracker_script.graph()
+    price_tracker_script.plot_stats()
     await ctx.send(f'Loading...')
 
 @client.command(name='discuss')
