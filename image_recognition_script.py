@@ -21,7 +21,6 @@ def detect_objects(img, net, output_layers):
     class_ids = []
     confidences = []
     boxes = []
-    # Detection Algorithm
     for out in outs:
         for detection in out:
             scores = detection[5:]
@@ -85,15 +84,15 @@ def generate_object_comment(class_ids, classes):
     else:
         return "The image does not contain any recognizable objects or figures."
 
-def main(image_path):
-    image = cv2.imread(image_path)
-    net, classes, output_layers = load_yolo()
-    class_ids, confidences, boxes = detect_objects(image, net, output_layers)
-    predominant_color = get_predominant_color(image_path)
+def analyze(path):
+    image = cv2.imread(path)
+    net, classes, layers = load_yolo()
+    class_ids, confidences, boxes = detect_objects(image, net, layers)
+    predominant_color = get_predominant_color(path)
     color_comment = generate_color_comment(predominant_color)
     object_comment = generate_object_comment(class_ids, classes)
     print(color_comment)
     print(object_comment)
     
-image_path = 'image_path.jpg'
-main(image_path)
+path = 'path.jpg'
+analyze(path)
