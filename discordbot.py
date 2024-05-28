@@ -54,6 +54,10 @@ async def use(ctx, user_input):
     lowered: str = user_input.lower()
     await ctx.send(f'Use {lowered} in a sentence.')
 
+@client.command(name='track')
+async def track(ctx, user_input):
+    price_tracker_script.track()
+    await ctx.send(f'Loading...')
 
 @client.command(name='discuss')
 async def discuss(ctx, *user_input, name='Anonymous'):
