@@ -288,34 +288,36 @@ plot_stats(ids, artists, prices, current_time)
 
 # ----------------PREDICTIVE MODELING---------------- #
 
-concert_data = pd.read_csv('stats.csv')
+def predict():
 
-# Convert timestamp columns to numeric values
-timestamp_cols = ['announced', 'event_timestamp', 'current_tme']
-for col in timestamp_cols:
-    concert_data[col] = pd.to_datetime(concert_data[col]).astype('int64') // 10**9
-
-# Drop non-numeric or non-relevant columns
-concert_data = concert_data.drop(columns=['id', 'title'])
-
-# Preprocess the data
-X = concert_data.drop(columns=['average_price'])  # Features
-y = concert_data['average_price']  # Target variable
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Choose a Linear Regression Model
-model = LinearRegression()
-model.fit(X_train, y_train)
-
-# Generate the Predictive Model
-y_pred = model.predict(X_test)
-mse = mean_squared_error(y_test, y_pred)
-print('Mean Squared Error:', mse)
-
-# Plot
-
-plt.scatter(y_test, y_pred)
-plt.xlabel('Actual Prices')
-plt.ylabel('Predicted Prices')
-plt.title('Actual vs. Predicted Prices')
-plt.show()
+    concert_data = pd.read_csv('stats.csv')
+    
+    # Convert timestamp columns to numeric values
+    timestamp_cols = ['announced', 'event_timestamp', 'current_tme']
+    for col in timestamp_cols:
+        concert_data[col] = pd.to_datetime(concert_data[col]).astype('int64') // 10**9
+    
+    # Drop non-numeric or non-relevant columns
+    concert_data = concert_data.drop(columns=['id', 'title'])
+    
+    # Preprocess the data
+    X = concert_data.drop(columns=['average_price'])  # Features
+    y = concert_data['average_price']  # Target variable
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    
+    # Choose a Linear Regression Model
+    model = LinearRegression()
+    model.fit(X_train, y_train)
+    
+    # Generate the Predictive Model
+    y_pred = model.predict(X_test)
+    mse = mean_squared_error(y_test, y_pred)
+    print('Mean Squared Error:', mse)
+    
+    # Plot
+    
+    plt.scatter(y_test, y_pred)
+    plt.xlabel('Actual Prices')
+    plt.ylabel('Predicted Prices')
+    plt.title('Actual vs. Predicted Prices')
+    plt.show()
